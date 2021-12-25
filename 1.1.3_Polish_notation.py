@@ -6,8 +6,8 @@
 """
 
 
-
 lst = input().split()
+# lst = '7 2 3 2 1 - 5 * - * + 4 +'.split()
 
 stack = []
 for char in lst:
