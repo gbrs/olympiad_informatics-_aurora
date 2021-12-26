@@ -4,28 +4,49 @@
 Программа должна вывести одну строку – результат перевода выражения в постфиксную нотацию.
 """
 
-'''https://habr.com/ru/post/596925/'''
+'''https://habr.com/ru/post/596925/
+Проходим исходный список;
+При нахождении числа, заносим его в выходной список;
+При нахождении оператора, заносим его в стек для операторов, но перед этим...;
+Выталкиваем в выходной список из стека все операторы, имеющие приоритет не ниже текущего оператора.
+    Вытолкнуть '(' может только ')', поэтому приоритет для '(' ставим самый маленький.
+    Не забываем проверить, что стек не пуст, чтобы не напороться на 'outofrange'.
+    Красивый обход этого: предварительно все исходное выражение обернуть в скобки;
+При нахождении открывающейся скобки, заносим её в стек;
+При нахождении закрывающей скобки, выталкиваем из стека все операторы до открывающейся скобки, 
+    а открывающуюся скобку удаляем из стека;
+В конце выталкиваем все оставшиеся операторы из стека.
+'''
 
 # lst = input().split()
-lst = '7 + 2 * ( 3 - (2 - 1) * 5 ) + 4'.split()
-# 7 2 3 2 1 - 5 * - * + 4 +
-# 7
-print(lst)
-answer_stack = []
+lst = '7 + 1 + 1 * 2 - 2 * ( 3 - ( 2 - 1 ) * 5 / 1 + 0 ) + 4'.split()
+# 7 1 + 1 2 * + 2 3 2 1 - 5 * 1 / - 0 + * - 4 +
+# ответ - 10
+priority_dict = {'*': 1,
+                 '/': 1,
+                 '+': 10,
+                 '-': 10,
+                 '(': 100
+                 }
+answer = []
 operator_stack = []
 
-for char in lst:
-    if char.isdigit():
-        answer_stack.append(char)
+for current in lst:
+    if current.isnumeric():
+        answer.append(current)
     else:
-        if char == '*':
-            operator_stack.append(char)
-        elif char == '(':
-            operator_stack.append(char)
-        elif char == ')':
-            answer_stack.append(operator_stack.pop())
+        if current == '(':
+            operator_stack.append(current)
+        elif current == ')':
+            while operator_stack[-1] != '(':
+                answer.append(operator_stack.pop())
             operator_stack.pop()
         else:
-            answer_stack.append(operator_stack.pop())
+            while operator_stack and priority_dict[current] >= priority_dict[operator_stack[-1]]:
+                answer.append(operator_stack.pop())
+            operator_stack.append(current)
 
-print(*answer_stack)
+while operator_stack:
+    answer.append(operator_stack.pop())
+
+print(*answer)
